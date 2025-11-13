@@ -116,7 +116,7 @@
                 }
 
                 const xhr = new XMLHttpRequest();
-                xhr.open("GET", URL + $("#input_id").val());
+                xhr.open("GET", URL + "/" + $("#input_id").val());
                 xhr.setRequestHeader("content-type", "application/json");
                 xhr.send();
 
@@ -197,7 +197,7 @@
                 }
 
                 const xhr = new XMLHttpRequest();
-                xhr.open("DELETE", URL + $("#input_id").val());
+                xhr.open("DELETE", URL + "/" + $("#input_id").val());
                 xhr.setRequestHeader("content-type", "application/json");
                 xhr.send();
 
@@ -219,7 +219,7 @@
                 }
 
                 const xhr = new XMLHttpRequest();
-                xhr.open("GET", URL + $("#input_id").val());
+                xhr.open("GET", URL + "/" + $("#input_id").val());
                 xhr.setRequestHeader("content-type", "application/json");
                 xhr.send();
 
