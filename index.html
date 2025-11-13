@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>[AJAX CRUD Version] 수강 과목 관리</title>
     
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     
 </head>
@@ -17,31 +18,66 @@
     <h3>목록</h3>
     <div id="div_list"></div>
     <button id="btn_list">목록 보기</button>
+    <button id="btn_add">새 과목 추가</button>
 
     <hr>
 
     <h3>데이터 관리</h3>
     ID (수정/삭제/조회용): <input type="text" id="input_id" size="5" />
-    <br/>
-    과목명: <input type="text" id="input_subject" />
-    교수명: <input type="text" id="input_professor" />
-    학점: <input type="number" id="input_credits" style="width: 60px;" />
-    학기: <input type="text" id="input_semester" placeholder="20XX-X" size="10" />
     <br/><br/>
 
-    <button id="btn_add">입력하기</button>
-    <button id="btn_update">수정하기</button>
-    <button id="btn_delete">삭제하기</button>
+    <button id="btn_update">ID로 수정하기</button>
+    <button id="btn_delete">ID로 삭제하기</button>
     <button id="btn_detail">ID로 조회하기</button>
+
+    <div class="modal fade" id="dataModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalTitle">데이터 관리</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <form id="modalForm">
+                <input type="hidden" id="modal_id">
+
+                <div class="mb-3">
+                    <label for="modal_subject" class="form-label">과목명</label>
+                    <input type="text" class="form-control" id="modal_subject">
+                </div>
+                <div class="mb-3">
+                    <label for="modal_professor" class="form-label">교수명</label>
+                    <input type="text" class="form-control" id="modal_professor">
+                </div>
+                <div class="mb-3">
+                    <label for="modal_credits" class="form-label">학점</label>
+                    <input type="number" class="form-control" id="modal_credits">
+                </div>
+                <div class="mb-3">
+                    <label for="modal_semester" class="form-label">학기</label>
+                    <input type="text" class="form-control" id="modal_semester" placeholder="20XX-X">
+                </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            <button type="button" class="btn btn-primary" id="btn_modal_save">저장</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
 
     <script>
         $(function(){
-
+            const URL = "https://6915405884e8bd126af939b5.mockapi.io/users"
+            const dataModal = new bootstrap.Modal(document.getElementById('dataModal'));
+            let currentMode = 'add';
+            let currentEditId = null;
             // 목록 보기
             $("#btn_list").click(function(){
                 const xhr = new XMLHttpRequest();
-                xhr.open("GET", "https://6915405884e8bd126af939b5.mockapi.io/users");
+                xhr.open("GET", URL);
                 xhr.setRequestHeader("content-type", "application/json");
                 xhr.send();
 
@@ -63,27 +99,13 @@
 
             // 추가하기
             $("#btn_add").click(function(){
-                const xhr = new XMLHttpRequest();
-                xhr.open("POST", "https://6915405884e8bd126af939b5.mockapi.io/users");
-                xhr.setRequestHeader("content-type", "application/json");
-                
-                let data = { 
-                    subject: $("#input_subject").val(), 
-                    professor: $("#input_professor").val(),
-                    credits: parseInt($("#input_credits").val()),
-                    semester: $("#input_semester").val()
-                };
-                xhr.send(JSON.stringify(data));
+                currentMode = 'add';
 
-                xhr.onload = () => {
-                    if (xhr.status === 201) { 
-                        let res = JSON.parse(xhr.response);
-                        alert("추가 완료: " + JSON.stringify(res));
-                        $("#btn_list").click();
-                    } else {
-                        console.log(xhr.status, xhr.statusText);
-                    }
-                }
+                $("#modalForm")[0].reset(); 
+                $("#modal_id").val("");
+                $("#modalTitle").text("새로운 수강 과목 추가");
+
+                dataModal.show(); 
             });
 
             // 수정하기
@@ -94,23 +116,69 @@
                 }
 
                 const xhr = new XMLHttpRequest();
-                xhr.open("PUT", "https://6915405884e8bd126af939b5.mockapi.io/users/" + $("#input_id").val());
+                xhr.open("GET", URL + $("#input_id").val());
                 xhr.setRequestHeader("content-type", "application/json");
-
-                let data = { 
-                    subject: $("#input_subject").val(), 
-                    professor: $("#input_professor").val(),
-                    credits: parseInt($("#input_credits").val()),
-                    semester: $("#input_semester").val()
-                };
-                xhr.send(JSON.stringify(data));
+                xhr.send();
 
                 xhr.onload = () => {
                     if (xhr.status === 200) {
                         let res = JSON.parse(xhr.response);
-                        alert("수정 완료: " + JSON.stringify(res));
+
+                        currentMode = 'update'; 
+                        currentEditId = res.id;
+
+                        $("#modalTitle").text("수강 과목 수정 (ID: " + res.id + ")");
+                        $("#modal_id").val(res.id);
+                        $("#modal_subject").val(res.subject);
+                        $("#modal_professor").val(res.professor);
+                        $("#modal_credits").val(res.credits);
+                        $("#modal_semester").val(res.semester);
+
+                        dataModal.show();
+
+                    } else {
+                        alert("ID에 해당하는 데이터를 찾을 수 없습니다.");
+                    }
+                }
+            });
+
+            $("#btn_modal_save").click(function(){
+
+                let data = { 
+                    subject: $("#modal_subject").val(), 
+                    professor: $("#modal_professor").val(),
+                    credits: parseInt($("#modal_credits").val()),
+                    semester: $("#modal_semester").val()
+                };
+                
+                if (data.subject === "" || data.professor === "") {
+                    alert("과목명과 교수명을 입력하세요.");
+                    return;
+                }
+
+                const xhr = new XMLHttpRequest();
+                let method = '';
+                let url = '';
+
+                if (currentMode === 'add') {
+                    method = 'POST';
+                    url = URL;
+                } else {
+                    method = 'PUT';
+                    url = URL + "/" + currentEditId;
+                }
+
+                xhr.open(method, url);
+                xhr.setRequestHeader("content-type", "application/json");
+                xhr.send(JSON.stringify(data));
+
+                xhr.onload = () => {
+                    if (xhr.status === 200 || xhr.status === 201) { 
+                        alert(currentMode === 'add' ? "추가 완료." : "수정 완료.");
+                        dataModal.hide();
                         $("#btn_list").click();
                     } else {
+                        alert("작업에 실패했습니다.");
                         console.log(xhr.status, xhr.statusText);
                     }
                 }
@@ -129,7 +197,7 @@
                 }
 
                 const xhr = new XMLHttpRequest();
-                xhr.open("DELETE", "https://6915405884e8bd126af939b5.mockapi.io/users/" + $("#input_id").val());
+                xhr.open("DELETE", URL + $("#input_id").val());
                 xhr.setRequestHeader("content-type", "application/json");
                 xhr.send();
 
@@ -151,7 +219,7 @@
                 }
 
                 const xhr = new XMLHttpRequest();
-                xhr.open("GET", "https://6915405884e8bd126af939b5.mockapi.io/users/" + $("#input_id").val());
+                xhr.open("GET", URL + $("#input_id").val());
                 xhr.setRequestHeader("content-type", "application/json");
                 xhr.send();
 
@@ -174,5 +242,7 @@
             $("#btn_list").click();
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </body>
 </html>
