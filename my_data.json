@@ -1,0 +1,81 @@
+{
+  "courses": [
+    {
+      "id": "1",
+      "subject": "OS Studio",
+      "professor": "Saejin Kim",
+      "credits": 3,
+      "semester": "2025-2"
+    },
+    {
+      "id": "2",
+      "subject": "Discrete Mathematics",
+      "professor": "Heeyeol Choi",
+      "credits": 3,
+      "semester": "2025-2"
+    },
+    {
+      "id": "3",
+      "subject": "C Studio",
+      "professor": "Kwang Kim",
+      "credits": 1,
+      "semester": "2022-2"
+    },
+    {
+      "id": "4",
+      "subject": "Data Structure",
+      "professor": "Hojoon Kim",
+      "credits": 3,
+      "semester": "2025-1"
+    },
+    {
+      "id": "5",
+      "subject": "Java Programming",
+      "professor": "Kiseok Kim",
+      "credits": 3,
+      "semester": "2025-1"
+    },
+    {
+      "id": "6",
+      "subject": "Programming Studio",
+      "professor": "Saejin Kim",
+      "credits": 2,
+      "semester": "2025-1"
+    },
+    {
+      "id": "7",
+      "subject": "Computer Structure",
+      "professor": "Hwanki Yong",
+      "credits": 3,
+      "semester": "2025-2"
+    },
+    {
+      "id": "8",
+      "subject": "Calculus 2",
+      "professor": "Joseph Cho",
+      "credits": 3,
+      "semester": "2025-2"
+    },
+    {
+      "id": "9",
+      "subject": "Logic Design",
+      "professor": "Kang Lee",
+      "credits": 3,
+      "semester": "2025-1"
+    },
+    {
+      "id": "10",
+      "subject": "Python Programming",
+      "professor": "Kyungmee Kim",
+      "credits": 3,
+      "semester": "2022-1"
+    },
+    {
+      "subject": "Chinese 1",
+      "professor": "Seonga Min",
+      "credits": 3,
+      "semester": "2022-03",
+      "id": "6db3"
+    }
+  ]
+}
